@@ -185,10 +185,6 @@ export default class PartialClosure extends Component {
     } = props;
     super();
 
-    if (isMobile) {
-      document.body.style.overflow = 'hidden';
-    }
-
     this.fiatRates = {}
     this.onRequestAnswer = (newOrder, isAccepted) => { };
 
@@ -322,10 +318,6 @@ export default class PartialClosure extends Component {
 
   componentWillUnmount() {
     this.timer = false;
-
-    if (isMobile) {
-      document.body.style.overflow = 'auto';
-    }
   }
 
   checkUrl = () => {
@@ -498,7 +490,7 @@ export default class PartialClosure extends Component {
             defaultMessage="Please top up your balance before you start the swap."
           /> :
           <FormattedMessage
-            id="walletDidntCreateTitle"
+            id="walletDidntCreateMessage"
             defaultMessage="Create {curr} wallet before you start the swap."
             values={{
               curr: haveCur
@@ -1299,6 +1291,21 @@ export default class PartialClosure extends Component {
                   defaultMessage="The amount you have on swap.online or an external wallet that you want to exchange"
                 />
               }
+              balanceTooltip={(estimatedFeeValues[haveCurrency]) 
+                ? () => {
+                  return (
+                    <FormattedMessage
+                      id="PartialClosure_BalanceTooltipInfo"
+                      defaultMessage="Ваш баланс {balance} {currency} минус коммисия майнера {minerFee} {currency}"
+                      values={{
+                        balance,
+                        minerFee: estimatedFeeValues[haveCurrency],
+                        currency: haveCurrency.toUpperCase(),
+                      }}
+                    />
+                  )
+                } : false
+              }
               placeholder="0.00000000"
               fiat={maxAmount > 0 && isNonOffers ? 0 : haveFiat}
               currencies={currencies}
@@ -1308,20 +1315,36 @@ export default class PartialClosure extends Component {
               }
               inputToolTip={() => isShowBalance ?
                 <p styleName="maxAmount">
-                  {/* <FormattedMessage id="partial221" defaultMessage="Balance: " /> */}
-                  {/* Math.floor(maxBuyAmount.toNumber() * 1000) / 1000}{' '}{haveCurrency.toUpperCase() */}
-                  {BigNumber(balance).toNumber() === 0 ? (
+                  {(
+                    (BigNumber(balance).toNumber() === 0)
+                    || BigNumber(balance).minus(estimatedFeeValues[haveCurrency]).isLessThanOrEqualTo(0)
+                  ) ? (
                     <FormattedMessage
                       id="partial766"
                       defaultMessage="From any wallet or exchange"
                     />
                   ) : (
                       <>
-                        <FormattedMessage
-                          id="partial767"
-                          defaultMessage="Your balance: "
-                        />
-                        {BigNumber(balance).dp(5, BigNumber.ROUND_FLOOR).toString()}
+                        {(estimatedFeeValues[haveCurrency])
+                          ? (
+                            <FormattedMessage
+                              id="PartialClosure_AvialableBalance"
+                              defaultMessage="Доступно: "
+                            />
+                          ) : (
+                            <FormattedMessage
+                              id="partial767"
+                              defaultMessage="Your balance: "
+                            />
+                          )
+                        }
+                        {(estimatedFeeValues[haveCurrency])
+                          ? BigNumber(balance)
+                            .minus(estimatedFeeValues[haveCurrency])
+                            .dp(5, BigNumber.ROUND_FLOOR).toString()
+                          : BigNumber(balance)
+                            .dp(5, BigNumber.ROUND_FLOOR).toString()
+                        }
                         {"  "}
                         {haveCurrency.toUpperCase()}
                       </>
@@ -1412,7 +1435,7 @@ export default class PartialClosure extends Component {
               <p styleName="error">
                 <FormattedMessage
                   id="PartialPriceNoOrdersReduceAllInfo"
-                  defaultMessage="No orders found. Enter amount less than {maxForBuy}, {maxForSell}"
+                  defaultMessage="This trade amount is too high for present market liquidity. Please reduce amount to {maxForSell}. "
                   values={{
                     maxForBuy: `${maxAmount} ${getCurrency.toUpperCase()}`,
                     maxForSell: `${maxBuyAmount} ${haveCurrency.toUpperCase()}`
