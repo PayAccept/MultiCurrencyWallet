@@ -194,6 +194,9 @@ git pull
 3. click "Create pull request" (enter any title)
 4. click "Merge pull request"
 
+## Got Error from chokidar: System limit for file watchers reached
+1. echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+
 If you have conflicts (if sources has been changed on your side) click "resolve conflicts".
 
 Any questions are welcome: [sashanoxon](https://t.me/sashanoxon)
