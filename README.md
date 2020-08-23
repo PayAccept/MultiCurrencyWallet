@@ -73,7 +73,12 @@ To access from other devices on the local network, specify your IP address:
 HOST=X.X.X.X npm run start
 ```
 
-7) Build for prod
+7) Build for testnet
+```
+npm run build:testnet http://local.lan
+```
+
+8) Build for prod
 ```
 npm run build
 ```
@@ -195,7 +200,9 @@ git pull
 4. click "Merge pull request"
 
 ## Got Error from chokidar: System limit for file watchers reached
-1. echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+```
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+```
 
 If you have conflicts (if sources has been changed on your side) click "resolve conflicts".
 
